@@ -21,10 +21,7 @@ class ReviewModel {
     required this.isApproved,
   });
 
-  factory ReviewModel.fromMap(
-    Map<String, dynamic> map,
-    String documentId,
-  ) {
+  factory ReviewModel.fromMap(Map<String, dynamic> map, String documentId) {
     return ReviewModel(
       id: documentId,
       userId: map['userId'] ?? '',

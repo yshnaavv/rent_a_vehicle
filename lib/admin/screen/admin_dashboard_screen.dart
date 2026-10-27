@@ -29,10 +29,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       loading = true;
     });
 
-    final provider = Provider.of<AdminProvider>(
-      context,
-      listen: false,
-    );
+    final provider = Provider.of<AdminProvider>(context, listen: false);
 
     try {
       users = await provider.getUserCount();
@@ -121,10 +118,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.maltMuted,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.maltMuted),
           ),
         ],
       ),
@@ -173,7 +167,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.turmeric,
                       borderRadius: BorderRadius.circular(20),

@@ -19,10 +19,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     super.initState();
     Future.microtask(() {
       if (!mounted) return;
-      Provider.of<OwnerVehicleProvider>(
-        context,
-        listen: false,
-      ).getMyVehicles();
+      Provider.of<OwnerVehicleProvider>(context, listen: false).getMyVehicles();
     });
   }
 
@@ -52,20 +49,19 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('My Fleet Vehicles'),
-      ),
+      appBar: AppBar(title: const Text('My Fleet Vehicles')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AddVehicleScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const AddVehicleScreen()),
           );
         },
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Vehicle', style: TextStyle(fontWeight: FontWeight.bold)),
+        label: const Text(
+          'Add Vehicle',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Consumer<OwnerVehicleProvider>(
         builder: (context, provider, child) {
@@ -104,10 +100,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'Add your first car or bike to start taking rentals.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
@@ -170,7 +163,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Text(
@@ -188,7 +182,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _statusBgColor(vehicle.approvalStatus),
+                                      color: _statusBgColor(
+                                        vehicle.approvalStatus,
+                                      ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -196,7 +192,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
-                                        color: _statusColor(vehicle.approvalStatus),
+                                        color: _statusColor(
+                                          vehicle.approvalStatus,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -212,7 +210,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                               ),
                               const SizedBox(height: 6),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '₹${vehicle.pricePerDay.toStringAsFixed(0)} / day',
@@ -225,7 +224,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        vehicle.isAvailable ? 'Available' : 'Paused',
+                                        vehicle.isAvailable
+                                            ? 'Available'
+                                            : 'Paused',
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
@@ -241,7 +242,10 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                                           activeThumbColor: AppColors.turmeric,
                                           value: vehicle.isAvailable,
                                           onChanged: (val) {
-                                            provider.changeAvailability(vehicle.id, val);
+                                            provider.changeAvailability(
+                                              vehicle.id,
+                                              val,
+                                            );
                                           },
                                         ),
                                       ),

@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import '../model/vehicle_model.dart';
 
 class VehicleProvider extends ChangeNotifier {
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   List<VehicleModel> vehicles = [];
 
@@ -23,14 +22,7 @@ class VehicleProvider extends ChangeNotifier {
 
       QuerySnapshot snapshot = await _firestore
           .collection('vehicles')
-          .where(
-            'approvalStatus',
-            isEqualTo: 'approved',
-          )
-          .where(
-            'isAvailable',
-            isEqualTo: true,
-          )
+          .where('isAvailable', isEqualTo: true)
           .get();
 
       vehicles = snapshot.docs.map((document) {
@@ -52,24 +44,12 @@ class VehicleProvider extends ChangeNotifier {
 
   // ================= GET BY CATEGORY =================
 
-  Future<List<VehicleModel>> getVehiclesByCategory(
-    String category,
-  ) async {
+  Future<List<VehicleModel>> getVehiclesByCategory(String category) async {
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('vehicles')
-          .where(
-            'category',
-            isEqualTo: category,
-          )
-          .where(
-            'approvalStatus',
-            isEqualTo: 'approved',
-          )
-          .where(
-            'isAvailable',
-            isEqualTo: true,
-          )
+          .where('category', isEqualTo: category)
+          .where('isAvailable', isEqualTo: true)
           .get();
 
       return snapshot.docs.map((document) {
@@ -88,15 +68,12 @@ class VehicleProvider extends ChangeNotifier {
 
   // ================= GET SINGLE VEHICLE =================
 
-  Future<VehicleModel?> getVehicle(
-    String vehicleId,
-  ) async {
+  Future<VehicleModel?> getVehicle(String vehicleId) async {
     try {
-      DocumentSnapshot document =
-          await _firestore
-              .collection('vehicles')
-              .doc(vehicleId)
-              .get();
+      DocumentSnapshot document = await _firestore
+          .collection('vehicles')
+          .doc(vehicleId)
+          .get();
 
       if (!document.exists) {
         return null;

@@ -26,7 +26,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 
   Future<void> login() async {
-    if (emailController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter admin credentials')),
       );
@@ -37,13 +38,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       isLoading = true;
     });
 
-    bool success = await Provider.of<AdminProvider>(
-      context,
-      listen: false,
-    ).loginAdmin(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    bool success = await Provider.of<AdminProvider>(context, listen: false)
+        .loginAdmin(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
     setState(() {
       isLoading = false;
@@ -54,14 +53,14 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     if (success) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const AdminHome(),
-        ),
+        MaterialPageRoute(builder: (_) => const AdminHome()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Invalid admin credentials. Use admin@gmail.com / admin123'),
+          content: Text(
+            'Invalid admin credentials. Use admin@gmail.com / admin123',
+          ),
         ),
       );
     }
@@ -71,9 +70,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Admin Console'),
-      ),
+      appBar: AppBar(title: const Text('Admin Console')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -124,10 +121,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   const Text(
                     'Sign in to manage fleet operations, users & compliance',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
 
                   const SizedBox(height: 32),
@@ -151,7 +145,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: AppColors.maltMuted,
                         ),
                         onPressed: () {

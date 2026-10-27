@@ -11,10 +11,7 @@ class AdminModel {
     required this.role,
   });
 
-  factory AdminModel.fromMap(
-    Map<String, dynamic> map,
-    String documentId,
-  ) {
+  factory AdminModel.fromMap(Map<String, dynamic> map, String documentId) {
     return AdminModel(
       uid: documentId,
       name: map['name'] ?? '',

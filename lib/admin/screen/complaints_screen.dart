@@ -142,7 +142,9 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
       builder: (ctx) {
         return AlertDialog(
           title: const Text('Delete Complaint Record?'),
-          content: const Text('Are you sure you want to permanently delete this complaint?'),
+          content: const Text(
+            'Are you sure you want to permanently delete this complaint?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -173,9 +175,8 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Complaint deleted')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Complaint deleted')));
       refreshComplaints();
     }
   }
@@ -204,9 +205,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           final complaints = snapshot.data ?? [];
@@ -240,10 +239,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'All user interactions and rental bookings are running smoothly.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -286,13 +282,18 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
                             decoration: BoxDecoration(
                               color: statusBg,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              complaint.status.replaceAll('_', ' ').toUpperCase(),
+                              complaint.status
+                                  .replaceAll('_', ' ')
+                                  .toUpperCase(),
                               style: TextStyle(
                                 color: statusClr,
                                 fontWeight: FontWeight.bold,
@@ -310,6 +311,19 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                           color: AppColors.maltMuted,
                         ),
                       ),
+                      if (complaint.bookingId.isNotEmpty ||
+                          complaint.vehicleId.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            'Booking: ${complaint.bookingId.isNotEmpty ? complaint.bookingId : "N/A"}${complaint.vehicleId.isNotEmpty ? " • Vehicle: ${complaint.vehicleId}" : ""}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.malt,
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 12),
                       Container(
                         width: double.infinity,
@@ -368,43 +382,75 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                         children: [
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
                             ),
                             onPressed: () => replyToComplaint(complaint),
                             icon: const Icon(Icons.reply_rounded, size: 16),
-                            label: const Text('Reply', style: TextStyle(fontSize: 13)),
+                            label: const Text(
+                              'Reply',
+                              style: TextStyle(fontSize: 13),
+                            ),
                           ),
                           if (complaint.status != 'in_progress')
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                               ),
-                              onPressed: () => changeStatus(complaint.id, 'in_progress'),
-                              child: const Text('In Progress', style: TextStyle(fontSize: 13)),
+                              onPressed: () =>
+                                  changeStatus(complaint.id, 'in_progress'),
+                              child: const Text(
+                                'In Progress',
+                                style: TextStyle(fontSize: 13),
+                              ),
                             ),
                           if (complaint.status != 'resolved')
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                                 foregroundColor: AppColors.success,
-                                side: const BorderSide(color: AppColors.success),
+                                side: const BorderSide(
+                                  color: AppColors.success,
+                                ),
                               ),
-                              onPressed: () => changeStatus(complaint.id, 'resolved'),
-                              child: const Text('Resolve', style: TextStyle(fontSize: 13)),
+                              onPressed: () =>
+                                  changeStatus(complaint.id, 'resolved'),
+                              child: const Text(
+                                'Resolve',
+                                style: TextStyle(fontSize: 13),
+                              ),
                             ),
                           if (complaint.status != 'rejected')
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                                 foregroundColor: AppColors.error,
                                 side: const BorderSide(color: AppColors.error),
                               ),
-                              onPressed: () => changeStatus(complaint.id, 'rejected'),
-                              child: const Text('Reject', style: TextStyle(fontSize: 13)),
+                              onPressed: () =>
+                                  changeStatus(complaint.id, 'rejected'),
+                              child: const Text(
+                                'Reject',
+                                style: TextStyle(fontSize: 13),
+                              ),
                             ),
                           IconButton(
                             onPressed: () => deleteComplaint(complaint.id),
-                            icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: AppColors.error,
+                            ),
                             tooltip: 'Delete Complaint',
                           ),
                         ],

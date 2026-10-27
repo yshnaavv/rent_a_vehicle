@@ -5,6 +5,7 @@ import '../provider/owner_provider.dart';
 import '../../theme/app_theme.dart';
 import 'owner_home.dart';
 import 'owner_register_screen.dart';
+import 'owner_pending_approval_screen.dart';
 
 class OwnerLoginScreen extends StatefulWidget {
   const OwnerLoginScreen({super.key});
@@ -26,40 +27,50 @@ class _OwnerLoginScreenState extends State<OwnerLoginScreen> {
   }
 
   Future<void> loginOwner() async {
-    if (emailController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter your email and password')),
       );
       return;
     }
 
-    bool success = await Provider.of<OwnerProvider>(
-      context,
-      listen: false,
-    ).loginOwner(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    final status = await Provider.of<OwnerProvider>(context, listen: false)
+        .loginOwner(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
     if (!mounted) return;
 
-    if (success) {
+    if (status == 'approved') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OwnerHome()),
+      );
+    } else if (status != null) {
+      if (status == 'pending') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Your account is waiting for admin approval.'),
+            backgroundColor: AppColors.malt,
+          ),
+        );
+      }
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const OwnerHome(),
+          builder: (_) => OwnerPendingApprovalScreen(status: status),
         ),
       );
     } else {
-      final provider = Provider.of<OwnerProvider>(
-        context,
-        listen: false,
-      );
+      final provider = Provider.of<OwnerProvider>(context, listen: false);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            provider.errorMessage ?? 'Partner login failed. Please check credentials.',
+            provider.errorMessage ??
+                'Partner login failed. Please check credentials.',
           ),
         ),
       );
@@ -70,9 +81,7 @@ class _OwnerLoginScreenState extends State<OwnerLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Partner Portal'),
-      ),
+      appBar: AppBar(title: const Text('Partner Portal')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -122,10 +131,7 @@ class _OwnerLoginScreenState extends State<OwnerLoginScreen> {
                   const Text(
                     'Manage your vehicles, fleet availability & bookings',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
 
                   const SizedBox(height: 32),
@@ -151,7 +157,9 @@ class _OwnerLoginScreenState extends State<OwnerLoginScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: AppColors.maltMuted,
                         ),
                         onPressed: () {

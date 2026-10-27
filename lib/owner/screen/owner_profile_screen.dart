@@ -15,9 +15,7 @@ class OwnerProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Partner Profile'),
-      ),
+      appBar: AppBar(title: const Text('Partner Profile')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -80,15 +78,35 @@ class OwnerProfileScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _infoTile(Icons.email_outlined, 'Email', data?['email'] ?? 'Not set'),
+                  _infoTile(
+                    Icons.email_outlined,
+                    'Email',
+                    data?['email'] ?? 'Not set',
+                  ),
                   const Divider(height: 1, indent: 56),
-                  _infoTile(Icons.phone_outlined, 'Mobile', data?['mobile'] ?? 'Not set'),
+                  _infoTile(
+                    Icons.phone_outlined,
+                    'Mobile',
+                    data?['mobile'] ?? 'Not set',
+                  ),
                   const Divider(height: 1, indent: 56),
-                  _infoTile(Icons.business_outlined, 'Shop Name', data?['shopName'] ?? 'Not set'),
+                  _infoTile(
+                    Icons.business_outlined,
+                    'Shop Name',
+                    data?['shopName'] ?? 'Not set',
+                  ),
                   const Divider(height: 1, indent: 56),
-                  _infoTile(Icons.location_on_outlined, 'Shop Address', data?['shopAddress'] ?? 'Not set'),
+                  _infoTile(
+                    Icons.location_on_outlined,
+                    'Shop Address',
+                    data?['shopAddress'] ?? 'Not set',
+                  ),
                   const Divider(height: 1, indent: 56),
-                  _infoTile(Icons.map_outlined, 'City / State', '${data?['city'] ?? ''}, ${data?['state'] ?? ''}'),
+                  _infoTile(
+                    Icons.map_outlined,
+                    'City / State',
+                    '${data?['city'] ?? ''}, ${data?['state'] ?? ''}',
+                  ),
                 ],
               ),
             ),
@@ -108,7 +126,9 @@ class OwnerProfileScreen extends StatelessWidget {
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text('Log Out?'),
-                      content: const Text('Are you sure you want to sign out from Partner portal?'),
+                      content: const Text(
+                        'Are you sure you want to sign out from Partner portal?',
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx, false),
@@ -130,9 +150,7 @@ class OwnerProfileScreen extends StatelessWidget {
 
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const OwnerLoginScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const OwnerLoginScreen()),
                     (route) => false,
                   );
                 },

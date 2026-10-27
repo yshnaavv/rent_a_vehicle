@@ -10,9 +10,7 @@ class ManageUsersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Manage Users'),
-      ),
+      appBar: AppBar(title: const Text('Manage Users')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('users').snapshots(),
         builder: (context, snapshot) {
@@ -51,10 +49,7 @@ class ManageUsersScreen extends StatelessWidget {
                   const SizedBox(height: 6),
                   const Text(
                     'Registered customer accounts will appear here.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -116,7 +111,9 @@ class ManageUsersScreen extends StatelessWidget {
                                 color: AppColors.maltMuted,
                               ),
                             ),
-                            if ((data['phone'] ?? '').toString().isNotEmpty) ...[
+                            if ((data['phone'] ?? '')
+                                .toString()
+                                .isNotEmpty) ...[
                               const SizedBox(height: 2),
                               Text(
                                 'Phone: ${data['phone']}',

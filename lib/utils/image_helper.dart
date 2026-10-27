@@ -1,6 +1,8 @@
-import 'dart:convert';
+ import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
 /// Helper utility to safely decode and render vehicle base64 images without crashing
@@ -29,7 +31,9 @@ class ImageHelper {
     BorderRadius? borderRadius,
     IconData fallbackIcon = Icons.directions_car,
   }) {
-    String? firstImage = (images != null && images.isNotEmpty) ? images.first : null;
+    String? firstImage = (images != null && images.isNotEmpty)
+        ? images.first
+        : null;
     Uint8List? bytes = decodeBase64(firstImage);
 
     Widget content;
@@ -39,11 +43,8 @@ class ImageHelper {
         width: width,
         height: height,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(
-          width: width,
-          height: height,
-          icon: fallbackIcon,
-        ),
+        errorBuilder: (context, error, stackTrace) =>
+            _buildPlaceholder(width: width, height: height, icon: fallbackIcon),
       );
     } else {
       content = _buildPlaceholder(
@@ -54,10 +55,7 @@ class ImageHelper {
     }
 
     if (borderRadius != null) {
-      return ClipRRect(
-        borderRadius: borderRadius,
-        child: content,
-      );
+      return ClipRRect(borderRadius: borderRadius, child: content);
     }
     return content;
   }

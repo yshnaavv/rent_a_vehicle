@@ -10,9 +10,7 @@ class AdminNotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Admin Notifications'),
-      ),
+      appBar: AppBar(title: const Text('Admin Notifications')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('notifications')
@@ -26,9 +24,7 @@ class AdminNotificationsScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -60,10 +56,7 @@ class AdminNotificationsScreen extends StatelessWidget {
                   const SizedBox(height: 6),
                   const Text(
                     'Platform alerts, system messages and audit events will show up here.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -112,7 +105,9 @@ class AdminNotificationsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: isRead ? AppColors.maltBorder : AppColors.turmeric,
+                          color: isRead
+                              ? AppColors.maltBorder
+                              : AppColors.turmeric,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -130,7 +125,9 @@ class AdminNotificationsScreen extends StatelessWidget {
                               title,
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: isRead ? FontWeight.w600 : FontWeight.w800,
+                                fontWeight: isRead
+                                    ? FontWeight.w600
+                                    : FontWeight.w800,
                                 color: AppColors.malt,
                               ),
                             ),

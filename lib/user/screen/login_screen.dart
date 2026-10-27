@@ -26,47 +26,50 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-    if (emailController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter email and password')),
       );
       return;
     }
 
-    String? role = await Provider.of<UserProvider>(
-      context,
-      listen: false,
-    ).loginUser(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    String? role = await Provider.of<UserProvider>(context, listen: false)
+        .loginUser(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
     if (!mounted) return;
 
     if (role == 'user') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const UserHome(),
-        ),
+        MaterialPageRoute(builder: (_) => const UserHome()),
       );
     } else if (role == 'owner') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('This account is registered as Owner. Please use Owner Login.'),
+          content: Text(
+            'This account is registered as Owner. Please use Owner Login.',
+          ),
         ),
       );
     } else if (role == 'admin') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('This account is registered as Admin. Please use Admin Login.'),
+          content: Text(
+            'This account is registered as Admin. Please use Admin Login.',
+          ),
         ),
       );
     } else {
       final provider = Provider.of<UserProvider>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(provider.errorMessage ?? 'Login failed. Please check credentials.'),
+          content: Text(
+            provider.errorMessage ?? 'Login failed. Please check credentials.',
+          ),
         ),
       );
     }
@@ -76,9 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('User Login'),
-      ),
+      appBar: AppBar(title: const Text('User Login')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -130,10 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text(
                     'Sign in to explore & book your next ride',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
 
                   const SizedBox(height: 32),
@@ -161,7 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: AppColors.maltMuted,
                         ),
                         onPressed: () {
@@ -193,7 +193,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )
                               : const Text(
                                   'Sign In',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                         ),
                       );

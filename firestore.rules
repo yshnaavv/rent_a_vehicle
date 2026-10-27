@@ -1,0 +1,142 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isOwner(ownerId) {
+      return isAuthenticated() && request.auth.uid == ownerId;
+    }
+
+    // ----------------------------------------------------
+    // USERS COLLECTION
+    // ----------------------------------------------------
+    match /users/{userId} {
+      allow read: if isUser(userId) || isAdmin();
+      allow create: if isUser(userId);
+      allow update: if isUser(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // OWNERS (VEHICLE PARTNERS) COLLECTION
+    // ----------------------------------------------------
+    match /owners/{ownerId} {
+      allow read: if isAuthenticated();
+      // On registration, partner creates their doc with approvalStatus 'pending'
+      allow create: if isOwner(ownerId) &&
+        request.resource.data.approvalStatus == 'pending';
+      // Partners can update their profile fields, but CANNOT self-approve
+      allow update: if (isOwner(ownerId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['approvalStatus', 'role']))
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // VEHICLES COLLECTION
+    // ----------------------------------------------------
+    match /vehicles/{vehicleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if (isAuthenticated() &&
+        resource.data.ownerId == request.auth.uid) || isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // BOOKINGS COLLECTION
+    // ----------------------------------------------------
+    match /bookings/{bookingId} {
+      // User who booked, Partner who owns the vehicle, or Admin can read
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Only the authenticated user can create a booking for themselves
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+
+      // Status updates:
+      // - Customer can cancel their own booking or record payment
+      // - Vehicle partner can approve/reject/complete bookings for their shop
+      // - Admin can manage all
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // COMPLAINTS COLLECTION
+    // ----------------------------------------------------
+    match /complaints/{complaintId} {
+      // Users can only read complaints they submitted. Admin can read all.
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Authenticated users can only create complaints under their own actual UID.
+      // Must start as 'pending' and empty admin reply.
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.submittedBy == 'user' &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.adminReply == '';
+
+      // ONLY Admins are permitted to reply or update complaint status.
+      // Users CANNOT tamper with complaints once submitted.
+      allow update: if isAdmin();
+
+      // Only admins can delete complaints
+      allow delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // REVIEWS COLLECTION
+    // ----------------------------------------------------
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if (isAuthenticated() &&
+        resource.data.userId == request.auth.uid) || isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // ADMINS COLLECTION
+    // ----------------------------------------------------
+    match /admins/{adminId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ----------------------------------------------------
+    // NOTIFICATIONS COLLECTION
+    // ----------------------------------------------------
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

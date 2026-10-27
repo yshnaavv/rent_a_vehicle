@@ -5,6 +5,7 @@ import '../provider/user_provider.dart';
 import '../../theme/app_theme.dart';
 import 'edit_profile_screen.dart';
 import 'login_screen.dart';
+import 'user_complaint_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -17,9 +18,7 @@ class ProfileScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            title: const Text('My Profile'),
-          ),
+          appBar: AppBar(title: const Text('My Profile')),
           body: data == null
               ? const Center(
                   child: CircularProgressIndicator(color: AppColors.turmeric),
@@ -31,7 +30,10 @@ class ProfileScreen extends StatelessWidget {
                       // Avatar Card
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 20,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -45,7 +47,10 @@ class ProfileScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.malt,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.turmeric, width: 3),
+                                border: Border.all(
+                                  color: AppColors.turmeric,
+                                  width: 3,
+                                ),
                               ),
                               child: const Icon(
                                 Icons.person_rounded,
@@ -131,6 +136,32 @@ class ProfileScreen extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
+                      // Support & Complaints Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const UserComplaintScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.support_agent_rounded,
+                            size: 20,
+                          ),
+                          label: const Text(
+                            'Support & File Complaint',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
                       // Logout Button
                       SizedBox(
                         width: double.infinity,
@@ -141,7 +172,9 @@ class ProfileScreen extends StatelessWidget {
                               context: context,
                               builder: (ctx) => AlertDialog(
                                 title: const Text('Log Out?'),
-                                content: const Text('Are you sure you want to sign out?'),
+                                content: const Text(
+                                  'Are you sure you want to sign out?',
+                                ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(ctx, false),

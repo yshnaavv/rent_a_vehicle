@@ -2,19 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class OwnerBookingProvider
-    extends ChangeNotifier {
+class OwnerBookingProvider extends ChangeNotifier {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
-
-  final FirebaseAuth _auth =
-      FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool isLoading = false;
 
-  List<Map<String, dynamic>> bookings =
-      [];
+  List<Map<String, dynamic>> bookings = [];
 
   Future<void> getOwnerBookings() async {
     try {
@@ -25,26 +20,18 @@ class OwnerBookingProvider
       isLoading = true;
       notifyListeners();
 
-      QuerySnapshot snapshot =
-          await _firestore
-              .collection('bookings')
-              .where(
-                'ownerId',
-                isEqualTo: user.uid,
-              )
-              .get();
+      QuerySnapshot snapshot = await _firestore
+          .collection('bookings')
+          .where('ownerId', isEqualTo: user.uid)
+          .get();
 
-      bookings = snapshot.docs.map(
-        (document) {
-          Map<String, dynamic> data =
-              document.data()
-                  as Map<String, dynamic>;
+      bookings = snapshot.docs.map((document) {
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-          data['id'] = document.id;
+        data['id'] = document.id;
 
-          return data;
-        },
-      ).toList();
+        return data;
+      }).toList();
 
       isLoading = false;
       notifyListeners();
@@ -59,10 +46,7 @@ class OwnerBookingProvider
     required String status,
   }) async {
     try {
-      await _firestore
-          .collection('bookings')
-          .doc(bookingId)
-          .update({
+      await _firestore.collection('bookings').doc(bookingId).update({
         'status': status,
       });
 

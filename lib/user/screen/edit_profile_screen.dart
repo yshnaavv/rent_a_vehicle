@@ -18,10 +18,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<UserProvider>(
-      context,
-      listen: false,
-    );
+    final provider = Provider.of<UserProvider>(context, listen: false);
     final data = provider.userData;
     nameController.text = data?['name'] ?? '';
     phoneController.text = data?['phone'] ?? '';
@@ -35,28 +32,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> updateProfile() async {
-    if (nameController.text.trim().isEmpty || phoneController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+    if (nameController.text.trim().isEmpty ||
+        phoneController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
-    bool success = await Provider.of<UserProvider>(
-      context,
-      listen: false,
-    ).updateProfile(
-      name: nameController.text.trim(),
-      phone: phoneController.text.trim(),
-    );
+    bool success = await Provider.of<UserProvider>(context, listen: false)
+        .updateProfile(
+          name: nameController.text.trim(),
+          phone: phoneController.text.trim(),
+        );
 
     if (!mounted) return;
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully'),
-        ),
+        const SnackBar(content: Text('Profile updated successfully')),
       );
       Navigator.pop(context);
     } else {
@@ -73,9 +67,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-      ),
+      appBar: AppBar(title: const Text('Edit Profile')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

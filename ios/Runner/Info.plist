@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Rent A Vehicle uses location to auto-detect partner shop location and GPS coordinates.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Rent A Vehicle uses photo library access to select vehicle fleet photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Rent A Vehicle uses camera access to take vehicle fleet photos.</string>
 </dict>
 </plist>

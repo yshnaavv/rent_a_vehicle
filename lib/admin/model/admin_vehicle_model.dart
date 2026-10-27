@@ -6,6 +6,7 @@ class AdminVehicleModel {
   final String model;
   final String category;
   final String location;
+  final String city;
   final double pricePerDay;
   final String shopName;
   final String approvalStatus;
@@ -20,6 +21,7 @@ class AdminVehicleModel {
     required this.model,
     required this.category,
     required this.location,
+    this.city = '',
     required this.pricePerDay,
     required this.shopName,
     required this.approvalStatus,
@@ -39,6 +41,7 @@ class AdminVehicleModel {
       model: map['model'] ?? '',
       category: map['category'] ?? '',
       location: map['location'] ?? '',
+      city: map['city'] ?? '',
       pricePerDay: (map['pricePerDay'] ?? 0).toDouble(),
       shopName: map['shopName'] ?? '',
       approvalStatus: map['approvalStatus'] ?? 'pending',

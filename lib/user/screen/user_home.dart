@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'vehicle_list_screen.dart';
 import 'my_bookings_screen.dart';
 import 'profile_screen.dart';
+import 'user_complaint_screen.dart';
 import '../../theme/app_theme.dart';
 
 class UserHome extends StatefulWidget {
@@ -18,6 +19,7 @@ class _UserHomeState extends State<UserHome> {
   final List<Widget> pages = const [
     HomeContent(),
     MyBookingsScreen(),
+    UserComplaintScreen(),
     ProfileScreen(),
   ];
 
@@ -43,6 +45,11 @@ class _UserHomeState extends State<UserHome> {
             icon: Icon(Icons.book_online_outlined),
             selectedIcon: Icon(Icons.book_online),
             label: 'Bookings',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.report_problem_outlined),
+            selectedIcon: Icon(Icons.report_problem),
+            label: 'Complaints',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
@@ -148,7 +155,10 @@ class HomeContent extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.turmeric,
                       borderRadius: BorderRadius.circular(20),
@@ -278,7 +288,11 @@ class HomeContent extends StatelessWidget {
                       subtitle: 'Choose vehicle',
                     ),
                   ),
-                  Icon(Icons.chevron_right_rounded, color: AppColors.turmeric, size: 20),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.turmeric,
+                    size: 20,
+                  ),
                   Expanded(
                     child: StepCard(
                       icon: Icons.calendar_month_rounded,
@@ -287,7 +301,11 @@ class HomeContent extends StatelessWidget {
                       subtitle: 'Pick dates',
                     ),
                   ),
-                  Icon(Icons.chevron_right_rounded, color: AppColors.turmeric, size: 20),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.turmeric,
+                    size: 20,
+                  ),
                   Expanded(
                     child: StepCard(
                       icon: Icons.key_rounded,
@@ -334,10 +352,8 @@ class HomeContent extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => VehicleListScreen(
-                  category: category,
-                  title: title,
-                ),
+                builder: (_) =>
+                    VehicleListScreen(category: category, title: title),
               ),
             );
           },
@@ -488,10 +504,7 @@ class StepCard extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           subtitle,
-          style: const TextStyle(
-            fontSize: 10,
-            color: AppColors.maltMuted,
-          ),
+          style: const TextStyle(fontSize: 10, color: AppColors.maltMuted),
         ),
       ],
     );

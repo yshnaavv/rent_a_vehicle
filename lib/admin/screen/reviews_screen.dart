@@ -59,9 +59,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Review rejected')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Review rejected')));
       refreshReviews();
     }
   }
@@ -72,7 +71,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       builder: (ctx) {
         return AlertDialog(
           title: const Text('Delete Review?'),
-          content: const Text('Are you sure you want to permanently delete this customer review?'),
+          content: const Text(
+            'Are you sure you want to permanently delete this customer review?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -101,9 +102,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Review removed')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Review removed')));
       refreshReviews();
     }
   }
@@ -112,7 +112,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     return Row(
       children: List.generate(5, (index) {
         return Icon(
-          index < rating.round() ? Icons.star_rounded : Icons.star_outline_rounded,
+          index < rating.round()
+              ? Icons.star_rounded
+              : Icons.star_outline_rounded,
           color: AppColors.turmeric,
           size: 20,
         );
@@ -144,9 +146,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           final reviews = snapshot.data ?? [];
@@ -180,10 +180,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'Customer ratings and reviews will be displayed here.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -233,7 +230,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    review.userName.isEmpty ? 'Verified User' : review.userName,
+                                    review.userName.isEmpty
+                                        ? 'Verified User'
+                                        : review.userName,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
@@ -252,7 +251,10 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                             ],
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: review.isApproved
                                   ? AppColors.successLight
@@ -293,27 +295,44 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                           if (!review.isApproved)
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                               ),
                               onPressed: () => approveReview(review.id),
                               icon: const Icon(Icons.check, size: 16),
-                              label: const Text('Approve', style: TextStyle(fontSize: 13)),
+                              label: const Text(
+                                'Approve',
+                                style: TextStyle(fontSize: 13),
+                              ),
                             )
                           else
                             OutlinedButton.icon(
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                                 foregroundColor: AppColors.warning,
-                                side: const BorderSide(color: AppColors.warning),
+                                side: const BorderSide(
+                                  color: AppColors.warning,
+                                ),
                               ),
                               onPressed: () => rejectReview(review.id),
                               icon: const Icon(Icons.block, size: 16),
-                              label: const Text('Revoke', style: TextStyle(fontSize: 13)),
+                              label: const Text(
+                                'Revoke',
+                                style: TextStyle(fontSize: 13),
+                              ),
                             ),
                           const SizedBox(width: 10),
                           IconButton(
                             onPressed: () => deleteReview(review.id),
-                            icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: AppColors.error,
+                            ),
                             tooltip: 'Delete review',
                           ),
                         ],

@@ -64,9 +64,7 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Partner Bookings'),
-      ),
+      appBar: AppBar(title: const Text('Partner Bookings')),
       body: Consumer<OwnerBookingProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -104,10 +102,7 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'New customer rental requests will appear here.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -226,6 +221,37 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
                           ],
                         ),
 
+                        const SizedBox(height: 6),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Payment Status:',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.maltMuted,
+                              ),
+                            ),
+                            Text(
+                              (booking['paymentStatus'] ?? 'pending')
+                                  .toString()
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    (booking['paymentStatus'] ?? '')
+                                            .toString()
+                                            .toLowerCase() ==
+                                        'completed'
+                                    ? Colors.green.shade700
+                                    : AppColors.malt,
+                              ),
+                            ),
+                          ],
+                        ),
+
                         if (status.toLowerCase() == 'pending') ...[
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 12),
@@ -250,7 +276,9 @@ class _OwnerBookingsScreenState extends State<OwnerBookingsScreen> {
                                 child: OutlinedButton.icon(
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.error,
-                                    side: const BorderSide(color: AppColors.error),
+                                    side: const BorderSide(
+                                      color: AppColors.error,
+                                    ),
                                   ),
                                   onPressed: () {
                                     provider.updateBookingStatus(
