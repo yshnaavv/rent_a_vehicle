@@ -7,6 +7,7 @@ class VehicleModel {
   final String category;
   final String description;
   final String location;
+  final String city;
   final double latitude;
   final double longitude;
   final double pricePerDay;
@@ -27,6 +28,7 @@ class VehicleModel {
     required this.category,
     required this.description,
     required this.location,
+    this.city = '',
     required this.latitude,
     required this.longitude,
     required this.pricePerDay,
@@ -39,10 +41,7 @@ class VehicleModel {
     required this.shopName,
   });
 
-  factory VehicleModel.fromMap(
-    Map<String, dynamic> map,
-    String documentId,
-  ) {
+  factory VehicleModel.fromMap(Map<String, dynamic> map, String documentId) {
     return VehicleModel(
       id: documentId,
       ownerId: map['ownerId'] ?? '',
@@ -52,6 +51,7 @@ class VehicleModel {
       category: map['category'] ?? '',
       description: map['description'] ?? '',
       location: map['location'] ?? '',
+      city: map['city'] ?? '',
       latitude: (map['latitude'] ?? 0).toDouble(),
       longitude: (map['longitude'] ?? 0).toDouble(),
       pricePerDay: (map['pricePerDay'] ?? 0).toDouble(),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'admin_dashboard_screen.dart';
 import 'manage_users_screen.dart';
 import 'manage_owners_screen.dart';
-import 'pending_vehicles_screen.dart';
 import 'manage_bookings_screen.dart';
 import 'notifications_screen.dart';
 import 'reviews_screen.dart';
@@ -25,7 +24,6 @@ class _AdminHomeState extends State<AdminHome> {
     AdminDashboardScreen(),
     ManageUsersScreen(),
     ManageOwnersScreen(),
-    PendingVehiclesScreen(),
     AllVehiclesScreen(),
     ManageBookingsScreen(),
     AdminNotificationsScreen(),
@@ -94,11 +92,6 @@ class _AdminHomeState extends State<AdminHome> {
                 label: Text('Owners'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.hourglass_top_outlined),
-                selectedIcon: Icon(Icons.hourglass_full),
-                label: Text('Pending'),
-              ),
-              NavigationRailDestination(
                 icon: Icon(Icons.directions_car_outlined),
                 selectedIcon: Icon(Icons.directions_car_filled),
                 label: Text('Vehicles'),
@@ -125,7 +118,11 @@ class _AdminHomeState extends State<AdminHome> {
               ),
             ],
           ),
-          const VerticalDivider(width: 1, thickness: 1, color: AppColors.maltBorder),
+          const VerticalDivider(
+            width: 1,
+            thickness: 1,
+            color: AppColors.maltBorder,
+          ),
           Expanded(child: pages[selectedIndex]),
         ],
       ),

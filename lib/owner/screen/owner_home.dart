@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import 'my_vehicles_screen.dart';
 import 'owner_bookings_screen.dart';
 import 'owner_profile_screen.dart';
+import 'owner_pending_approval_screen.dart';
 
 class OwnerHome extends StatefulWidget {
   const OwnerHome({super.key});
@@ -20,17 +21,34 @@ class _OwnerHomeState extends State<OwnerHome> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async {
       if (!mounted) return;
-      Provider.of<OwnerProvider>(
-        context,
-        listen: false,
-      ).loadOwnerData();
+      final provider = Provider.of<OwnerProvider>(context, listen: false);
+      await provider.loadOwnerData();
+      if (!mounted) return;
+      if (provider.currentApprovalStatus != 'approved') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OwnerPendingApprovalScreen(
+              status: provider.currentApprovalStatus,
+            ),
+          ),
+        );
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final ownerProvider = Provider.of<OwnerProvider>(context);
+    if (ownerProvider.ownerData != null &&
+        ownerProvider.currentApprovalStatus != 'approved') {
+      return OwnerPendingApprovalScreen(
+        status: ownerProvider.currentApprovalStatus,
+      );
+    }
+
     final List<Widget> pages = [
       const OwnerDashboard(),
       const OwnerBookingsScreen(),
@@ -76,15 +94,14 @@ class OwnerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Partner Dashboard'),
-      ),
+      appBar: AppBar(title: const Text('Partner Dashboard')),
       body: Consumer<OwnerProvider>(
         builder: (context, provider, child) {
           final ownerData = provider.ownerData;
           final String name = ownerData?['fullName'] ?? 'Partner';
           final String shopName = ownerData?['shopName'] ?? 'Vehicle Fleet';
-          final String shopAddress = ownerData?['shopAddress'] ?? 'No address registered';
+          final String shopAddress =
+              ownerData?['shopAddress'] ?? 'No address registered';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -116,7 +133,10 @@ class OwnerDashboard extends StatelessWidget {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.turmeric,
                               borderRadius: BorderRadius.circular(20),
@@ -172,7 +192,8 @@ class OwnerDashboard extends StatelessWidget {
                 _dashboardActionCard(
                   context,
                   title: 'Fleet & Vehicles',
-                  subtitle: 'Add new models, manage rates and toggle availability',
+                  subtitle:
+                      'Add new models, manage rates and toggle availability',
                   icon: Icons.directions_car_rounded,
                   badge: 'Manage',
                   onTap: () {
@@ -330,7 +351,10 @@ class OwnerDashboard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.turmericLight,
                               borderRadius: BorderRadius.circular(6),

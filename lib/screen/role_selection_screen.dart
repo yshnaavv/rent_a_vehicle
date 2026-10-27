@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 
 import '../admin/screen/admin_login_screen.dart';
@@ -8,8 +10,36 @@ import '../theme/app_theme.dart';
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
+  /// Evaluates whether the application is running in a phone environment
+  /// (Native mobile app or mobile web viewport) vs a computer/desktop environment.
+  bool _isPhoneEnvironment(BuildContext context) {
+    if (!kIsWeb) {
+      // Native mobile builds: Android or iOS apps
+      if (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS) {
+        return true;
+      }
+      // Native desktop OS builds: Windows, macOS, Linux
+      return false;
+    }
+
+    // Flutter Web build running on computer vs mobile browser
+    final width = MediaQuery.of(context).size.width;
+    final isMobileOS =
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS;
+
+    if (isMobileOS || width < 650) {
+      return true;
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isPhone = _isPhoneEnvironment(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -62,14 +92,19 @@ class RoleSelectionScreen extends StatelessWidget {
 
                   // Tagline / Subtitle
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.turmericLight,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      'PREMIUM MOBILITY & RENTALS',
-                      style: TextStyle(
+                    child: Text(
+                      isPhone
+                          ? 'MOBILE MOBILITY PORTAL'
+                          : 'DESKTOP COMMAND PORTAL',
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: AppColors.malt,
@@ -80,75 +115,99 @@ class RoleSelectionScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  const Text(
-                    'Select your portal to continue',
-                    style: TextStyle(
+                  Text(
+                    isPhone
+                        ? 'Select User or Partner portal to continue'
+                        : 'Select Partner or Administrator portal to continue',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                       color: AppColors.maltMuted,
-                      fontSize: 15,
+                      fontSize: 14,
                     ),
                   ),
 
                   const SizedBox(height: 36),
 
-                  // User Portal
-                  _roleCard(
-                    context,
-                    title: 'User Portal',
-                    subtitle: 'Browse, book & drive premium vehicles',
-                    icon: Icons.person_rounded,
-                    badgeText: 'Explore',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  // PHONE: Show User Portal & Vehicle Partner
+                  if (isPhone) ...[
+                    _roleCard(
+                      context,
+                      title: 'User Portal',
+                      subtitle: 'Browse, book & drive premium vehicles',
+                      icon: Icons.person_rounded,
+                      badgeText: 'Explore',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                    ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Owner Portal
-                  _roleCard(
-                    context,
-                    title: 'Vehicle Partner',
-                    subtitle: 'Manage shop, vehicles & fleet bookings',
-                    icon: Icons.store_mall_directory_rounded,
-                    badgeText: 'Partner',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const OwnerLoginScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                    _roleCard(
+                      context,
+                      title: 'Vehicle Partner',
+                      subtitle: 'Manage shop, vehicles & fleet bookings',
+                      icon: Icons.store_mall_directory_rounded,
+                      badgeText: 'Partner',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const OwnerLoginScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ]
+                  // COMPUTER / WEB BROWSER: Show Vehicle Partner & Admin
+                  else ...[
+                    _roleCard(
+                      context,
+                      title: 'Vehicle Partner',
+                      subtitle: 'Manage shop, vehicles & fleet bookings',
+                      icon: Icons.store_mall_directory_rounded,
+                      badgeText: 'Partner',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const OwnerLoginScreen(),
+                          ),
+                        );
+                      },
+                    ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Admin Portal
-                  _roleCard(
-                    context,
-                    title: 'Administrator',
-                    subtitle: 'Platform analytics, fleet approvals & controls',
-                    icon: Icons.admin_panel_settings_rounded,
-                    badgeText: 'Control',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const AdminLoginScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                    _roleCard(
+                      context,
+                      title: 'Administrator',
+                      subtitle:
+                          'Platform analytics, fleet approvals & controls',
+                      icon: Icons.admin_panel_settings_rounded,
+                      badgeText: 'Control',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AdminLoginScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
 
                   const SizedBox(height: 32),
 
                   Text(
-                    'Secure & Reliable Fleet Rental Ecosystem',
+                    isPhone
+                        ? 'Secure & Reliable Mobile Fleet Rental'
+                        : 'Administrative & Partner Management Dashboard',
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColors.maltMuted.withValues(alpha: 0.8),
@@ -206,11 +265,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     color: AppColors.malt,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(
-                    icon,
-                    color: AppColors.turmeric,
-                    size: 26,
-                  ),
+                  child: Icon(icon, color: AppColors.turmeric, size: 26),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -219,17 +274,23 @@ class RoleSelectionScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.malt,
+                          Flexible(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.malt,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.turmericLight,
                               borderRadius: BorderRadius.circular(6),
@@ -261,7 +322,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.background,
                     shape: BoxShape.circle,
                   ),
@@ -279,5 +340,3 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 }
-
-// safest branch that has been saved

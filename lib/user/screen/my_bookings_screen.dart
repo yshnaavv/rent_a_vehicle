@@ -19,10 +19,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     super.initState();
     Future.microtask(() {
       if (!mounted) return;
-      Provider.of<BookingProvider>(
-        context,
-        listen: false,
-      ).getMyBookings();
+      Provider.of<BookingProvider>(context, listen: false).getMyBookings();
     });
   }
 
@@ -56,9 +53,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('My Bookings'),
-      ),
+      appBar: AppBar(title: const Text('My Bookings')),
       body: Consumer<BookingProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -96,10 +91,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'Your vehicle reservations will appear here.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -132,9 +124,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => BookingDetailsScreen(
-                            booking: booking,
-                          ),
+                          builder: (_) =>
+                              BookingDetailsScreen(booking: booking),
                         ),
                       );
                     },

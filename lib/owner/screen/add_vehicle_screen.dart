@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/owner_vehicle_provider.dart';
@@ -24,6 +26,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   final modelController = TextEditingController();
   final descriptionController = TextEditingController();
   final locationController = TextEditingController();
+  final cityController = TextEditingController();
   final priceController = TextEditingController();
   final seatsController = TextEditingController(text: '4');
   final latitudeController = TextEditingController();
@@ -34,6 +37,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   String fuelType = 'Petrol';
   List<String> base64Images = [];
   bool loading = false;
+  bool isDetectingLocation = false;
 
   @override
   void dispose() {
@@ -42,6 +46,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     modelController.dispose();
     descriptionController.dispose();
     locationController.dispose();
+    cityController.dispose();
     priceController.dispose();
     seatsController.dispose();
     latitudeController.dispose();
@@ -49,28 +54,157 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     super.dispose();
   }
 
+  Future<void> autoDetectLocation() async {
+    setState(() => isDetectingLocation = true);
+
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Location services are disabled. Please enable GPS in device settings or enter location manually.',
+            ),
+            backgroundColor: AppColors.malt,
+          ),
+        );
+        setState(() => isDetectingLocation = false);
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Location permission denied. You can enter your vehicle location manually.',
+              ),
+              backgroundColor: AppColors.malt,
+            ),
+          );
+          setState(() => isDetectingLocation = false);
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Location permission permanently denied. Enable it in App Settings or enter location manually.',
+            ),
+            backgroundColor: AppColors.malt,
+            action: SnackBarAction(
+              label: 'Settings',
+              textColor: AppColors.turmeric,
+              onPressed: () => Geolocator.openAppSettings(),
+            ),
+          ),
+        );
+        setState(() => isDetectingLocation = false);
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      latitudeController.text = position.latitude.toStringAsFixed(6);
+      longitudeController.text = position.longitude.toStringAsFixed(6);
+
+      // Try reverse geocoding to auto-fill city and location address
+      try {
+        List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          Placemark place = placemarks.first;
+          if (cityController.text.trim().isEmpty &&
+              (place.locality ?? '').isNotEmpty) {
+            cityController.text = place.locality!;
+          }
+
+          if (locationController.text.trim().isEmpty) {
+            final parts = [
+              place.name,
+              place.street,
+              place.subLocality,
+              place.locality,
+            ].where((s) => s != null && s.isNotEmpty).toSet().toList();
+            if (parts.isNotEmpty) {
+              locationController.text = parts.join(', ');
+            }
+          }
+        }
+      } catch (_) {
+        // Reverse geocoding fallback
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vehicle GPS location detected successfully!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not retrieve GPS location: $e. Please enter manually.',
+          ),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isDetectingLocation = false);
+      }
+    }
+  }
+
   Future<void> pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-    if (image == null) return;
+      if (image == null) return;
 
-    Uint8List originalBytes = await image.readAsBytes();
+      Uint8List originalBytes = await image.readAsBytes();
 
-    Uint8List compressedBytes = await FlutterImageCompress.compressWithList(
-      originalBytes,
-      minWidth: 800,
-      minHeight: 600,
-      quality: 60,
-    );
+      Uint8List compressedBytes = await FlutterImageCompress.compressWithList(
+        originalBytes,
+        minWidth: 800,
+        minHeight: 600,
+        quality: 60,
+      );
 
-    String base64Image = base64Encode(compressedBytes);
+      String base64Image = base64Encode(compressedBytes);
 
-    setState(() {
-      base64Images.add(base64Image);
-    });
+      setState(() {
+        base64Images.add(base64Image);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Photo access not granted. You can still add your vehicle without an image.',
+          ),
+          backgroundColor: AppColors.malt,
+        ),
+      );
+    }
   }
 
   Future<void> saveVehicle() async {
@@ -78,19 +212,19 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         brandController.text.trim().isEmpty ||
         modelController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty ||
-        locationController.text.trim().isEmpty) {
+        locationController.text.trim().isEmpty ||
+        cityController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill all required vehicle fields'),
+          content: Text(
+            'Please fill all required vehicle fields (including city and location)',
+          ),
         ),
       );
       return;
     }
 
-    final ownerProvider = Provider.of<OwnerProvider>(
-      context,
-      listen: false,
-    );
+    final ownerProvider = Provider.of<OwnerProvider>(context, listen: false);
 
     final vehicleProvider = Provider.of<OwnerVehicleProvider>(
       context,
@@ -108,6 +242,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       category: category,
       description: descriptionController.text.trim(),
       location: locationController.text.trim(),
+      city: cityController.text.trim(),
       latitude: double.tryParse(latitudeController.text.trim()) ?? 0,
       longitude: double.tryParse(longitudeController.text.trim()) ?? 0,
       pricePerDay: double.tryParse(priceController.text.trim()) ?? 0,
@@ -127,14 +262,17 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vehicle submitted successfully. Waiting for admin approval.'),
+          content: Text('Vehicle added to fleet successfully!'),
+          backgroundColor: AppColors.success,
         ),
       );
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(vehicleProvider.errorMessage ?? 'Failed to add vehicle'),
+          content: Text(
+            vehicleProvider.errorMessage ?? 'Failed to add vehicle',
+          ),
         ),
       );
     }
@@ -171,16 +309,17 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Add Vehicle to Fleet'),
-      ),
+      appBar: AppBar(title: const Text('Add Vehicle to Fleet')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Vehicle Details Section
-            _sectionTitle('Vehicle Identification', Icons.directions_car_rounded),
+            _sectionTitle(
+              'Vehicle Identification',
+              Icons.directions_car_rounded,
+            ),
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -224,13 +363,14 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                   const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     initialValue: category,
-                    decoration: const InputDecoration(
-                      labelText: 'Category *',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Category *'),
                     items: const [
                       DropdownMenuItem(value: 'car', child: Text('Car')),
                       DropdownMenuItem(value: 'bike', child: Text('Bike')),
-                      DropdownMenuItem(value: 'modified', child: Text('Modified Vehicle')),
+                      DropdownMenuItem(
+                        value: 'modified',
+                        child: Text('Modified Vehicle'),
+                      ),
                     ],
                     onChanged: (value) {
                       if (value != null) {
@@ -275,8 +415,14 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             labelText: 'Transmission *',
                           ),
                           items: const [
-                            DropdownMenuItem(value: 'Manual', child: Text('Manual')),
-                            DropdownMenuItem(value: 'Automatic', child: Text('Automatic')),
+                            DropdownMenuItem(
+                              value: 'Manual',
+                              child: Text('Manual'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Automatic',
+                              child: Text('Automatic'),
+                            ),
                           ],
                           onChanged: (value) {
                             if (value != null) {
@@ -295,10 +441,22 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             labelText: 'Fuel Type *',
                           ),
                           items: const [
-                            DropdownMenuItem(value: 'Petrol', child: Text('Petrol')),
-                            DropdownMenuItem(value: 'Diesel', child: Text('Diesel')),
-                            DropdownMenuItem(value: 'Electric', child: Text('Electric')),
-                            DropdownMenuItem(value: 'Hybrid', child: Text('Hybrid')),
+                            DropdownMenuItem(
+                              value: 'Petrol',
+                              child: Text('Petrol'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Diesel',
+                              child: Text('Diesel'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Electric',
+                              child: Text('Electric'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Hybrid',
+                              child: Text('Hybrid'),
+                            ),
                           ],
                           onChanged: (value) {
                             if (value != null) {
@@ -326,8 +484,30 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
 
             const SizedBox(height: 24),
 
-            // Location & Pricing Section
-            _sectionTitle('Rates & Location', Icons.attach_money_rounded),
+            // Pricing Section
+            _sectionTitle('Rental Pricing', Icons.attach_money_rounded),
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.maltBorder),
+              ),
+              child: TextField(
+                controller: priceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Daily Rental Rate (₹) *',
+                  hintText: 'e.g. 2500',
+                  prefixIcon: Icon(Icons.currency_rupee),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Vehicle Location Section
+            _sectionTitle('Vehicle Location', Icons.location_on_rounded),
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -336,23 +516,42 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                 border: Border.all(color: AppColors.maltBorder),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  OutlinedButton.icon(
+                    onPressed: isDetectingLocation ? null : autoDetectLocation,
+                    icon: isDetectingLocation
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.malt,
+                            ),
+                          )
+                        : const Icon(Icons.my_location_rounded),
+                    label: Text(
+                      isDetectingLocation
+                          ? 'Detecting GPS Location...'
+                          : 'Use Current Location',
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   TextField(
-                    controller: priceController,
-                    keyboardType: TextInputType.number,
+                    controller: cityController,
                     decoration: const InputDecoration(
-                      labelText: 'Daily Rental Rate (₹) *',
-                      hintText: 'e.g. 2500',
-                      prefixIcon: Icon(Icons.currency_rupee),
+                      labelText: 'City / District *',
+                      hintText: 'e.g. Mumbai, Bangalore',
+                      prefixIcon: Icon(Icons.location_city_rounded),
                     ),
                   ),
                   const SizedBox(height: 14),
                   TextField(
                     controller: locationController,
                     decoration: const InputDecoration(
-                      labelText: 'Pick-up Location / City *',
-                      hintText: 'e.g. Downtown Metro Hub',
-                      prefixIcon: Icon(Icons.location_on_outlined),
+                      labelText: 'Pick-up Location / Address *',
+                      hintText: 'e.g. Near Metro Station, Terminal 2',
+                      prefixIcon: Icon(Icons.place_outlined),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -361,10 +560,14 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                       Expanded(
                         child: TextField(
                           controller: latitudeController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                            signed: true,
+                          ),
                           decoration: const InputDecoration(
                             labelText: 'Latitude',
-                            hintText: 'Optional',
+                            hintText: 'e.g. 19.0760',
+                            prefixIcon: Icon(Icons.explore_outlined),
                           ),
                         ),
                       ),
@@ -372,10 +575,14 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                       Expanded(
                         child: TextField(
                           controller: longitudeController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                            signed: true,
+                          ),
                           decoration: const InputDecoration(
                             labelText: 'Longitude',
-                            hintText: 'Optional',
+                            hintText: 'e.g. 72.8777',
+                            prefixIcon: Icon(Icons.explore_outlined),
                           ),
                         ),
                       ),
@@ -421,7 +628,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                 height: 90,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppColors.maltBorder),
+                                  border: Border.all(
+                                    color: AppColors.maltBorder,
+                                  ),
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(11),
@@ -490,7 +699,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                         ),
                       )
                     : const Text(
-                        'Submit Vehicle for Approval',
+                        'Add Vehicle to Fleet',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

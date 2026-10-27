@@ -17,10 +17,7 @@ class _ManageBookingsScreenState extends State<ManageBookingsScreen> {
     super.initState();
     Future.microtask(() {
       if (!mounted) return;
-      Provider.of<AdminBookingProvider>(
-        context,
-        listen: false,
-      ).getBookings();
+      Provider.of<AdminBookingProvider>(context, listen: false).getBookings();
     });
   }
 
@@ -63,9 +60,7 @@ class _ManageBookingsScreenState extends State<ManageBookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('All Reservations'),
-      ),
+      appBar: AppBar(title: const Text('All Reservations')),
       body: Consumer<AdminBookingProvider>(
         builder: (context, provider, child) {
           if (provider.bookings.isEmpty) {
@@ -97,10 +92,7 @@ class _ManageBookingsScreenState extends State<ManageBookingsScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'Customer reservations across all partner shops will appear here.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -171,11 +163,25 @@ class _ManageBookingsScreenState extends State<ManageBookingsScreen> {
                                 color: AppColors.malt,
                               ),
                             ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'Payment: ${booking.paymentStatus.toUpperCase()}${booking.paymentReference.isNotEmpty ? " (${booking.paymentReference})" : ""}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: booking.paymentStatus == 'completed'
+                                    ? Colors.green.shade800
+                                    : AppColors.maltMuted,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: statusBg,
                           borderRadius: BorderRadius.circular(12),

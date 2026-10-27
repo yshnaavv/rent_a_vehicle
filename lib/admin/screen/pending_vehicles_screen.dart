@@ -29,9 +29,7 @@ class _PendingVehiclesScreenState extends State<PendingVehiclesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Pending Approvals'),
-      ),
+      appBar: AppBar(title: const Text('Pending Approvals')),
       body: Consumer<AdminVehicleProvider>(
         builder: (context, provider, child) {
           final pendingVehicles = provider.vehicles
@@ -67,10 +65,7 @@ class _PendingVehiclesScreenState extends State<PendingVehiclesScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'No vehicles currently pending administrative approval.',
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
                 ],
               ),
@@ -148,7 +143,10 @@ class _PendingVehiclesScreenState extends State<PendingVehiclesScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.warningLight,
                               borderRadius: BorderRadius.circular(12),

@@ -9,6 +9,7 @@ import 'theme/app_theme.dart';
 import 'user/provider/user_provider.dart';
 import 'user/provider/vehicle_provider.dart';
 import 'user/provider/booking_provider.dart';
+import 'user/provider/user_complaint_provider.dart';
 
 // Owner providers
 import 'owner/provider/owner_provider.dart';
@@ -38,6 +39,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => VehicleProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
+        ChangeNotifierProvider(create: (_) => UserComplaintProvider()),
 
         // Owner Providers
         ChangeNotifierProvider(create: (_) => OwnerProvider()),

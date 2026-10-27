@@ -9,6 +9,7 @@ class ComplaintModel {
   final String submittedBy;
   final String status;
   final String adminReply;
+  final dynamic createdAt;
 
   ComplaintModel({
     required this.id,
@@ -21,12 +22,10 @@ class ComplaintModel {
     required this.submittedBy,
     required this.status,
     required this.adminReply,
+    this.createdAt,
   });
 
-  factory ComplaintModel.fromMap(
-    Map<String, dynamic> map,
-    String documentId,
-  ) {
+  factory ComplaintModel.fromMap(Map<String, dynamic> map, String documentId) {
     return ComplaintModel(
       id: documentId,
       userId: map['userId'] ?? '',
@@ -38,6 +37,7 @@ class ComplaintModel {
       submittedBy: map['submittedBy'] ?? '',
       status: map['status'] ?? 'pending',
       adminReply: map['adminReply'] ?? '',
+      createdAt: map['createdAt'],
     );
   }
 }

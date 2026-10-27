@@ -5,11 +5,9 @@ import 'package:flutter/material.dart';
 import '../model/vehicle_model.dart';
 
 class OwnerVehicleProvider extends ChangeNotifier {
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  final FirebaseAuth _auth =
-      FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool isLoading = false;
 
@@ -24,6 +22,7 @@ class OwnerVehicleProvider extends ChangeNotifier {
     required String category,
     required String description,
     required String location,
+    String city = '',
     required double latitude,
     required double longitude,
     required double pricePerDay,
@@ -55,6 +54,7 @@ class OwnerVehicleProvider extends ChangeNotifier {
 
         'description': description.trim(),
         'location': location.trim(),
+        'city': city.trim(),
 
         'latitude': latitude,
         'longitude': longitude,
@@ -70,13 +70,12 @@ class OwnerVehicleProvider extends ChangeNotifier {
 
         'shopName': shopName,
 
-        // Important
-        'approvalStatus': 'pending',
+        // Direct approval without admin intervention
+        'approvalStatus': 'approved',
 
         'isAvailable': true,
 
-        'createdAt':
-            FieldValue.serverTimestamp(),
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
       isLoading = false;
@@ -104,19 +103,14 @@ class OwnerVehicleProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      QuerySnapshot snapshot =
-          await _firestore
-              .collection('vehicles')
-              .where(
-                'ownerId',
-                isEqualTo: user.uid,
-              )
-              .get();
+      QuerySnapshot snapshot = await _firestore
+          .collection('vehicles')
+          .where('ownerId', isEqualTo: user.uid)
+          .get();
 
       vehicles = snapshot.docs.map((document) {
         return OwnerVehicleModel.fromMap(
-          document.data()
-              as Map<String, dynamic>,
+          document.data() as Map<String, dynamic>,
           document.id,
         );
       }).toList();
@@ -139,6 +133,7 @@ class OwnerVehicleProvider extends ChangeNotifier {
     required String category,
     required String description,
     required String location,
+    String city = '',
     required double latitude,
     required double longitude,
     required double pricePerDay,
@@ -151,16 +146,14 @@ class OwnerVehicleProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      await _firestore
-          .collection('vehicles')
-          .doc(vehicleId)
-          .update({
+      await _firestore.collection('vehicles').doc(vehicleId).update({
         'vehicleName': vehicleName.trim(),
         'brand': brand.trim(),
         'model': model.trim(),
         'category': category,
         'description': description.trim(),
         'location': location.trim(),
+        'city': city.trim(),
         'latitude': latitude,
         'longitude': longitude,
         'pricePerDay': pricePerDay,
@@ -169,8 +162,8 @@ class OwnerVehicleProvider extends ChangeNotifier {
         'seats': seats,
         'images': images,
 
-        // Edit requires admin approval again
-        'approvalStatus': 'pending',
+        // Keep approved
+        'approvalStatus': 'approved',
       });
 
       isLoading = false;
@@ -189,15 +182,9 @@ class OwnerVehicleProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> changeAvailability(
-    String vehicleId,
-    bool value,
-  ) async {
+  Future<bool> changeAvailability(String vehicleId, bool value) async {
     try {
-      await _firestore
-          .collection('vehicles')
-          .doc(vehicleId)
-          .update({
+      await _firestore.collection('vehicles').doc(vehicleId).update({
         'isAvailable': value,
       });
 
@@ -213,14 +200,9 @@ class OwnerVehicleProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> deleteVehicle(
-    String vehicleId,
-  ) async {
+  Future<bool> deleteVehicle(String vehicleId) async {
     try {
-      await _firestore
-          .collection('vehicles')
-          .doc(vehicleId)
-          .delete();
+      await _firestore.collection('vehicles').doc(vehicleId).delete();
 
       await getMyVehicles();
 

@@ -33,9 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         phoneController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill all required fields'),
-        ),
+        const SnackBar(content: Text('Please fill all required fields')),
       );
       return;
     }
@@ -49,15 +47,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    bool success = await Provider.of<UserProvider>(
-      context,
-      listen: false,
-    ).registerUser(
-      name: nameController.text.trim(),
-      email: emailController.text.trim(),
-      phone: phoneController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    bool success = await Provider.of<UserProvider>(context, listen: false)
+        .registerUser(
+          name: nameController.text.trim(),
+          email: emailController.text.trim(),
+          phone: phoneController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
     if (!mounted) return;
 
@@ -71,11 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       final provider = Provider.of<UserProvider>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            provider.errorMessage ?? 'Registration failed',
-          ),
-        ),
+        SnackBar(content: Text(provider.errorMessage ?? 'Registration failed')),
       );
     }
   }
@@ -84,9 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Create Account'),
-      ),
+      appBar: AppBar(title: const Text('Create Account')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -136,10 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Text(
                     'Create your profile to start renting vehicles',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.maltMuted,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: AppColors.maltMuted, fontSize: 14),
                   ),
 
                   const SizedBox(height: 32),
@@ -188,7 +175,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: AppColors.maltMuted,
                         ),
                         onPressed: () {

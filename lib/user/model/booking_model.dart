@@ -12,8 +12,14 @@ class BookingModel {
   final int numberOfDays;
   final double totalAmount;
 
-  final String status;
+  final String
+  status; // 'pending', 'confirmed', 'cancelled', 'completed', 'rejected'
   final String location;
+
+  final String
+  paymentStatus; // 'unpaid', 'pending', 'completed', 'failed', 'cancelled'
+  final String paymentReference;
+  final String paymentMethod;
 
   BookingModel({
     required this.id,
@@ -28,12 +34,12 @@ class BookingModel {
     required this.totalAmount,
     required this.status,
     required this.location,
+    this.paymentStatus = 'pending',
+    this.paymentReference = '',
+    this.paymentMethod = '',
   });
 
-  factory BookingModel.fromMap(
-    Map<String, dynamic> map,
-    String documentId,
-  ) {
+  factory BookingModel.fromMap(Map<String, dynamic> map, String documentId) {
     return BookingModel(
       id: documentId,
       userId: map['userId'] ?? '',
@@ -47,6 +53,9 @@ class BookingModel {
       totalAmount: (map['totalAmount'] ?? 0).toDouble(),
       status: map['status'] ?? 'pending',
       location: map['location'] ?? '',
+      paymentStatus: map['paymentStatus'] ?? 'pending',
+      paymentReference: map['paymentReference'] ?? '',
+      paymentMethod: map['paymentMethod'] ?? '',
     );
   }
 }

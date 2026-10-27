@@ -8,10 +8,7 @@ import 'booking_screen.dart';
 class VehicleDetailsScreen extends StatefulWidget {
   final VehicleModel vehicle;
 
-  const VehicleDetailsScreen({
-    super.key,
-    required this.vehicle,
-  });
+  const VehicleDetailsScreen({super.key, required this.vehicle});
 
   @override
   State<VehicleDetailsScreen> createState() => _VehicleDetailsScreenState();
@@ -27,9 +24,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(vehicle.vehicleName),
-      ),
+      appBar: AppBar(title: Text(vehicle.vehicleName)),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
@@ -77,9 +72,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => BookingScreen(
-                                  vehicle: vehicle,
-                                ),
+                                builder: (_) => BookingScreen(vehicle: vehicle),
                               ),
                             );
                           }
@@ -140,9 +133,14 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: vehicle.isAvailable ? AppColors.success : AppColors.error,
+                      color: vehicle.isAvailable
+                          ? AppColors.success
+                          : AppColors.error,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
@@ -165,7 +163,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          vehicle.isAvailable ? 'AVAILABLE NOW' : 'NOT AVAILABLE',
+                          vehicle.isAvailable
+                              ? 'AVAILABLE NOW'
+                              : 'NOT AVAILABLE',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -184,7 +184,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             if (images.length > 1)
               Container(
                 height: 70,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: images.length,
@@ -202,7 +205,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSelected ? AppColors.turmeric : Colors.transparent,
+                            color: isSelected
+                                ? AppColors.turmeric
+                                : Colors.transparent,
                             width: 2.5,
                           ),
                         ),
@@ -255,7 +260,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.turmericLight,
                           borderRadius: BorderRadius.circular(8),

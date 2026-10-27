@@ -5,8 +5,7 @@ import '../model/admin_vehicle_model.dart';
 
 class AdminVehicleProvider extends ChangeNotifier {
   List<AdminVehicleModel> vehicles = [];
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool isLoading = false;
   String? errorMessage;
@@ -14,14 +13,12 @@ class AdminVehicleProvider extends ChangeNotifier {
   // Get all vehicles
   Future<List<AdminVehicleModel>> getVehicles() async {
     try {
-      QuerySnapshot<Map<String, dynamic>> snapshot =
-          await _firestore.collection('vehicles').get();
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+          .collection('vehicles')
+          .get();
 
       return snapshot.docs.map((doc) {
-        return AdminVehicleModel.fromMap(
-          doc.data(),
-          doc.id,
-        );
+        return AdminVehicleModel.fromMap(doc.data(), doc.id);
       }).toList();
     } catch (e) {
       errorMessage = e.toString();
@@ -31,45 +28,38 @@ class AdminVehicleProvider extends ChangeNotifier {
 
   // Get pending vehicles
   Future<List<AdminVehicleModel>> getPendingVehicles() async {
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await _firestore
-            .collection('vehicles')
-            .where('approvalStatus', isEqualTo: 'pending')
-            .get();
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+        .collection('vehicles')
+        .where('approvalStatus', isEqualTo: 'pending')
+        .get();
 
     return snapshot.docs.map((doc) {
-      return AdminVehicleModel.fromMap(
-        doc.data(),
-        doc.id,
-      );
+      return AdminVehicleModel.fromMap(doc.data(), doc.id);
     }).toList();
   }
 
   // Approve a vehicle
   Future<void> approveVehicle(String vehicleId) async {
-  await _firestore.collection('vehicles').doc(vehicleId).update({
-    'approvalStatus': 'approved',
-    'isAvailable': true,
-  });
+    await _firestore.collection('vehicles').doc(vehicleId).update({
+      'approvalStatus': 'approved',
+      'isAvailable': true,
+    });
 
-  await getAllVehicles();
-}
+    await getAllVehicles();
+  }
 
-// reject vehicle
-Future<void> rejectVehicle(String vehicleId) async {
-  await _firestore.collection('vehicles').doc(vehicleId).update({
-    'approvalStatus': 'rejected',
-    'isAvailable': false,
-  });
+  // reject vehicle
+  Future<void> rejectVehicle(String vehicleId) async {
+    await _firestore.collection('vehicles').doc(vehicleId).update({
+      'approvalStatus': 'rejected',
+      'isAvailable': false,
+    });
 
-  await getAllVehicles();
-}
+    await getAllVehicles();
+  }
 
   // Change vehicle availability
-  Future<void> changeAvailability(
-    String vehicleId,
-    bool isAvailable,
-  ) async {
+  Future<void> changeAvailability(String vehicleId, bool isAvailable) async {
     await _firestore.collection('vehicles').doc(vehicleId).update({
       'isAvailable': isAvailable,
     });
@@ -86,12 +76,12 @@ Future<void> rejectVehicle(String vehicleId) async {
 
   //get all vehicle
   Future<void> getAllVehicles() async {
-  try {
-    vehicles = await getVehicles();
-    notifyListeners();
-  } catch (e) {
-    errorMessage = e.toString();
-    notifyListeners();
+    try {
+      vehicles = await getVehicles();
+      notifyListeners();
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
   }
-}
 }

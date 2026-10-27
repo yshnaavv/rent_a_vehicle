@@ -4,15 +4,17 @@ import 'package:flutter/material.dart';
 
 class OwnerProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool isLoading = false;
-
   String? errorMessage;
-
   Map<String, dynamic>? ownerData;
+
+  String get currentApprovalStatus {
+    return (ownerData?['approvalStatus'] ?? 'pending').toString().toLowerCase();
+  }
+
+  bool get isApproved => currentApprovalStatus == 'approved';
 
   Future<bool> registerOwner({
     required String fullName,
@@ -33,63 +35,52 @@ class OwnerProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      UserCredential credential =
-          await _auth.createUserWithEmailAndPassword(
+      UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
       );
 
       String uid = credential.user!.uid;
 
-      await _firestore
-          .collection('owners')
-          .doc(uid)
-          .set({
+      final data = {
         'uid': uid,
         'fullName': fullName.trim(),
         'email': email.trim(),
         'mobile': mobile.trim(),
-
         'shopName': shopName.trim(),
         'shopAddress': shopAddress.trim(),
         'city': city.trim(),
         'state': state.trim(),
         'pincode': pincode.trim(),
         'shopPhone': shopPhone.trim(),
-
         'latitude': latitude,
         'longitude': longitude,
-
         'role': 'owner',
+        'approvalStatus': 'pending', // Partner starts in pending approval
+        'createdAt': FieldValue.serverTimestamp(),
+      };
 
-        'createdAt':
-            FieldValue.serverTimestamp(),
-      });
+      await _firestore.collection('owners').doc(uid).set(data);
 
       await loadOwnerData();
 
       isLoading = false;
       notifyListeners();
-
       return true;
     } on FirebaseAuthException catch (e) {
       errorMessage = e.message;
-
       isLoading = false;
       notifyListeners();
-
       return false;
     } catch (e) {
       errorMessage = e.toString();
-
       isLoading = false;
       notifyListeners();
-
       return false;
     }
   }
 
-  Future<bool> loginOwner({
+  Future<String?> loginOwner({
     required String email,
     required String password,
   }) async {
@@ -98,73 +89,77 @@ class OwnerProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      UserCredential credential =
-          await _auth.signInWithEmailAndPassword(
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
       );
 
       String uid = credential.user!.uid;
 
-      DocumentSnapshot document =
-          await _firestore
-              .collection('owners')
-              .doc(uid)
-              .get();
+      DocumentSnapshot document = await _firestore
+          .collection('owners')
+          .doc(uid)
+          .get();
 
       if (!document.exists) {
-        errorMessage =
-            'Owner data not found';
-
+        errorMessage = 'Partner account details not found in database.';
         await _auth.signOut();
-
         isLoading = false;
         notifyListeners();
-
-        return false;
+        return null;
       }
 
-      await loadOwnerData();
+      ownerData = document.data() as Map<String, dynamic>;
+      final status = (ownerData?['approvalStatus'] ?? 'pending')
+          .toString()
+          .toLowerCase();
 
       isLoading = false;
       notifyListeners();
-
-      return true;
+      return status;
     } on FirebaseAuthException catch (e) {
       errorMessage = e.message;
-
       isLoading = false;
       notifyListeners();
-
-      return false;
+      return null;
     } catch (e) {
       errorMessage = e.toString();
-
       isLoading = false;
       notifyListeners();
-
-      return false;
+      return null;
     }
   }
 
   Future<void> loadOwnerData() async {
     User? user = _auth.currentUser;
-
     if (user == null) return;
 
-    DocumentSnapshot document =
-        await _firestore
-            .collection('owners')
-            .doc(user.uid)
-            .get();
+    DocumentSnapshot document = await _firestore
+        .collection('owners')
+        .doc(user.uid)
+        .get();
 
     if (document.exists) {
-      ownerData =
-          document.data()
-              as Map<String, dynamic>;
-
+      ownerData = document.data() as Map<String, dynamic>;
       notifyListeners();
     }
+  }
+
+  Future<String> checkApprovalStatus() async {
+    User? user = _auth.currentUser;
+    if (user == null) return 'pending';
+
+    DocumentSnapshot document = await _firestore
+        .collection('owners')
+        .doc(user.uid)
+        .get();
+
+    if (document.exists) {
+      ownerData = document.data() as Map<String, dynamic>;
+      notifyListeners();
+      return currentApprovalStatus;
+    }
+    return 'pending';
   }
 
   Future<bool> updateOwnerProfile({
@@ -179,13 +174,9 @@ class OwnerProvider extends ChangeNotifier {
   }) async {
     try {
       User? user = _auth.currentUser;
-
       if (user == null) return false;
 
-      await _firestore
-          .collection('owners')
-          .doc(user.uid)
-          .update({
+      await _firestore.collection('owners').doc(user.uid).update({
         'fullName': fullName.trim(),
         'mobile': mobile.trim(),
         'shopName': shopName.trim(),
@@ -197,22 +188,17 @@ class OwnerProvider extends ChangeNotifier {
       });
 
       await loadOwnerData();
-
       return true;
     } catch (e) {
       errorMessage = e.toString();
-
       notifyListeners();
-
       return false;
     }
   }
 
   Future<void> logout() async {
     await _auth.signOut();
-
     ownerData = null;
-
     notifyListeners();
   }
 }

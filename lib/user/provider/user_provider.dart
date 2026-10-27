@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 
 class UserProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool isLoading = false;
 
@@ -26,11 +25,11 @@ class UserProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
+            email: email.trim(),
+            password: password.trim(),
+          );
 
       String uid = userCredential.user!.uid;
 
@@ -77,16 +76,17 @@ class UserProvider extends ChangeNotifier {
       errorMessage = null;
       notifyListeners();
 
-      UserCredential userCredential =
-          await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
       );
 
       String uid = userCredential.user!.uid;
 
-      DocumentSnapshot document =
-          await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot document = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
 
       if (!document.exists) {
         errorMessage = 'User data not found';
@@ -97,8 +97,7 @@ class UserProvider extends ChangeNotifier {
         return null;
       }
 
-      Map<String, dynamic> data =
-          document.data() as Map<String, dynamic>;
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
       String role = data['role'] ?? 'user';
 
@@ -134,12 +133,13 @@ class UserProvider extends ChangeNotifier {
       return;
     }
 
-    DocumentSnapshot document =
-        await _firestore.collection('users').doc(user.uid).get();
+    DocumentSnapshot document = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
     if (document.exists) {
-      userData =
-          document.data() as Map<String, dynamic>;
+      userData = document.data() as Map<String, dynamic>;
 
       notifyListeners();
     }
@@ -158,10 +158,7 @@ class UserProvider extends ChangeNotifier {
         return false;
       }
 
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .update({
+      await _firestore.collection('users').doc(user.uid).update({
         'name': name.trim(),
         'phone': phone.trim(),
       });

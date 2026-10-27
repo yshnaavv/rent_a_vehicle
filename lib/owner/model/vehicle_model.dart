@@ -9,6 +9,7 @@ class OwnerVehicleModel {
 
   final String description;
   final String location;
+  final String city;
 
   final double latitude;
   final double longitude;
@@ -36,6 +37,7 @@ class OwnerVehicleModel {
     required this.category,
     required this.description,
     required this.location,
+    this.city = '',
     required this.latitude,
     required this.longitude,
     required this.pricePerDay,
@@ -61,6 +63,7 @@ class OwnerVehicleModel {
       category: map['category'] ?? '',
       description: map['description'] ?? '',
       location: map['location'] ?? '',
+      city: map['city'] ?? '',
       latitude: (map['latitude'] ?? 0).toDouble(),
       longitude: (map['longitude'] ?? 0).toDouble(),
       pricePerDay: (map['pricePerDay'] ?? 0).toDouble(),

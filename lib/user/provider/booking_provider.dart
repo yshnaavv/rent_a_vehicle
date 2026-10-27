@@ -5,16 +5,11 @@ import 'package:flutter/material.dart';
 import '../model/booking_model.dart';
 
 class BookingProvider extends ChangeNotifier {
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance;
-
-  final FirebaseAuth _auth =
-      FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool isLoading = false;
-
   String? errorMessage;
-
   List<BookingModel> bookings = [];
 
   // ================= CREATE BOOKING =================
@@ -29,6 +24,10 @@ class BookingProvider extends ChangeNotifier {
     required String endDate,
     required int numberOfDays,
     required double totalAmount,
+    String paymentStatus = 'completed',
+    String paymentReference = '',
+    String paymentMethod = 'razorpay_test_mode',
+    String status = 'confirmed',
   }) async {
     try {
       User? user = _auth.currentUser;
@@ -53,12 +52,10 @@ class BookingProvider extends ChangeNotifier {
         'endDate': endDate,
         'numberOfDays': numberOfDays,
         'totalAmount': totalAmount,
-
-        // No real payment in our project.
-        'paymentStatus': 'not_required',
-
-        'status': 'pending',
-
+        'paymentStatus': paymentStatus,
+        'paymentReference': paymentReference,
+        'paymentMethod': paymentMethod,
+        'status': status,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -68,10 +65,38 @@ class BookingProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       errorMessage = e.toString();
-
       isLoading = false;
       notifyListeners();
+      return false;
+    }
+  }
 
+  // ================= UPDATE PAYMENT STATUS =================
+
+  Future<bool> updatePaymentStatus({
+    required String bookingId,
+    required String paymentStatus,
+    required String paymentReference,
+    required String paymentMethod,
+    String? bookingStatus,
+  }) async {
+    try {
+      final Map<String, dynamic> updateData = {
+        'paymentStatus': paymentStatus,
+        'paymentReference': paymentReference,
+        'paymentMethod': paymentMethod,
+        'paymentUpdatedAt': FieldValue.serverTimestamp(),
+      };
+      if (bookingStatus != null) {
+        updateData['status'] = bookingStatus;
+      }
+
+      await _firestore.collection('bookings').doc(bookingId).update(updateData);
+      await getMyBookings();
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
       return false;
     }
   }
@@ -91,10 +116,7 @@ class BookingProvider extends ChangeNotifier {
 
       QuerySnapshot snapshot = await _firestore
           .collection('bookings')
-          .where(
-            'userId',
-            isEqualTo: user.uid,
-          )
+          .where('userId', isEqualTo: user.uid)
           .get();
 
       bookings = snapshot.docs.map((document) {
@@ -104,15 +126,12 @@ class BookingProvider extends ChangeNotifier {
         );
       }).toList();
 
-      bookings.sort(
-        (a, b) => b.id.compareTo(a.id),
-      );
+      bookings.sort((a, b) => b.id.compareTo(a.id));
 
       isLoading = false;
       notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
-
       isLoading = false;
       notifyListeners();
     }
@@ -120,24 +139,17 @@ class BookingProvider extends ChangeNotifier {
 
   // ================= CANCEL BOOKING =================
 
-  Future<bool> cancelBooking(
-    String bookingId,
-  ) async {
+  Future<bool> cancelBooking(String bookingId) async {
     try {
-      await _firestore
-          .collection('bookings')
-          .doc(bookingId)
-          .update({
+      await _firestore.collection('bookings').doc(bookingId).update({
         'status': 'cancelled',
       });
 
       await getMyBookings();
-
       return true;
     } catch (e) {
       errorMessage = e.toString();
       notifyListeners();
-
       return false;
     }
   }

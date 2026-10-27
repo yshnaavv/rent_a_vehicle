@@ -17,17 +17,13 @@ class OfferModel {
     required this.isActive,
   });
 
-  factory OfferModel.fromMap(
-    Map<String, dynamic> map,
-    String documentId,
-  ) {
+  factory OfferModel.fromMap(Map<String, dynamic> map, String documentId) {
     return OfferModel(
       id: documentId,
       ownerId: map['ownerId'] ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
-      discountPercentage:
-          (map['discountPercentage'] ?? 0).toDouble(),
+      discountPercentage: (map['discountPercentage'] ?? 0).toDouble(),
       vehicleId: map['vehicleId'] ?? '',
       isActive: map['isActive'] ?? true,
     );

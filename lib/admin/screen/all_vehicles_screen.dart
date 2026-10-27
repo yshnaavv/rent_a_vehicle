@@ -16,7 +16,6 @@ class AllVehiclesScreen extends StatefulWidget {
 class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
   final TextEditingController searchController = TextEditingController();
   late Future<List<AdminVehicleModel>> vehiclesFuture;
-  String selectedStatus = 'all';
   String selectedCategory = 'all';
 
   @override
@@ -44,15 +43,13 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
     try {
       await action();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(successMessage)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(successMessage)));
       refreshVehicles();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -62,7 +59,9 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Delete Vehicle?'),
-          content: Text('Are you sure you want to delete ${vehicle.vehicleName}?'),
+          content: Text(
+            'Are you sure you want to delete ${vehicle.vehicleName}?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
@@ -86,28 +85,6 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
         () => context.read<AdminVehicleProvider>().deleteVehicle(vehicle.id),
         'Vehicle deleted successfully',
       );
-    }
-  }
-
-  Color statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'approved':
-        return AppColors.success;
-      case 'rejected':
-        return AppColors.error;
-      default:
-        return AppColors.warning;
-    }
-  }
-
-  Color statusBgColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'approved':
-        return AppColors.successLight;
-      case 'rejected':
-        return AppColors.errorLight;
-      default:
-        return AppColors.warningLight;
     }
   }
 
@@ -139,10 +116,16 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       hintText: 'Search by model, brand, or shop...',
-                      prefixIcon: const Icon(Icons.search, color: AppColors.malt),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppColors.malt,
+                      ),
                       suffixIcon: searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear, color: AppColors.maltMuted),
+                              icon: const Icon(
+                                Icons.clear,
+                                color: AppColors.maltMuted,
+                              ),
                               onPressed: () {
                                 searchController.clear();
                                 setState(() {});
@@ -156,34 +139,16 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                 SizedBox(
                   width: 150,
                   child: DropdownButtonFormField<String>(
-                    initialValue: selectedStatus,
-                    decoration: const InputDecoration(
-                      labelText: 'Status',
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'all', child: Text('All Status')),
-                      DropdownMenuItem(value: 'pending', child: Text('Pending')),
-                      DropdownMenuItem(value: 'approved', child: Text('Approved')),
-                      DropdownMenuItem(value: 'rejected', child: Text('Rejected')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setState(() => selectedStatus = val);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 14),
-                SizedBox(
-                  width: 150,
-                  child: DropdownButtonFormField<String>(
                     initialValue: selectedCategory,
-                    decoration: const InputDecoration(
-                      labelText: 'Category',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Category'),
                     items: const [
                       DropdownMenuItem(value: 'all', child: Text('All Types')),
                       DropdownMenuItem(value: 'car', child: Text('Cars')),
                       DropdownMenuItem(value: 'bike', child: Text('Bikes')),
-                      DropdownMenuItem(value: 'modified', child: Text('Modified')),
+                      DropdownMenuItem(
+                        value: 'modified',
+                        child: Text('Modified'),
+                      ),
                     ],
                     onChanged: (val) {
                       if (val != null) setState(() => selectedCategory = val);
@@ -202,7 +167,9 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: CircularProgressIndicator(color: AppColors.turmeric),
+                      child: CircularProgressIndicator(
+                        color: AppColors.turmeric,
+                      ),
                     );
                   }
 
@@ -216,22 +183,25 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                   final query = searchController.text.trim().toLowerCase();
 
                   final vehicles = allVehicles.where((vehicle) {
-                    final matchesStatus = selectedStatus == 'all' ||
-                        vehicle.approvalStatus.toLowerCase() == selectedStatus;
-                    final matchesCategory = selectedCategory == 'all' ||
+                    final matchesCategory =
+                        selectedCategory == 'all' ||
                         vehicle.category.toLowerCase() == selectedCategory;
-                    final matchesSearch = vehicle.vehicleName.toLowerCase().contains(query) ||
+                    final matchesSearch =
+                        vehicle.vehicleName.toLowerCase().contains(query) ||
                         vehicle.brand.toLowerCase().contains(query) ||
                         vehicle.shopName.toLowerCase().contains(query);
 
-                    return matchesStatus && matchesCategory && matchesSearch;
+                    return matchesCategory && matchesSearch;
                   }).toList();
 
                   if (vehicles.isEmpty) {
                     return const Center(
                       child: Text(
                         'No matching vehicles found.',
-                        style: TextStyle(color: AppColors.maltMuted, fontSize: 16),
+                        style: TextStyle(
+                          color: AppColors.maltMuted,
+                          fontSize: 16,
+                        ),
                       ),
                     );
                   }
@@ -275,7 +245,8 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                                   const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           vehicle.vehicleName,
@@ -311,13 +282,19 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                                       vertical: 5,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: statusBgColor(vehicle.approvalStatus),
+                                      color: vehicle.isAvailable
+                                          ? AppColors.successLight
+                                          : AppColors.errorLight,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      vehicle.approvalStatus.toUpperCase(),
+                                      vehicle.isAvailable
+                                          ? 'AVAILABLE'
+                                          : 'UNAVAILABLE',
                                       style: TextStyle(
-                                        color: statusColor(vehicle.approvalStatus),
+                                        color: vehicle.isAvailable
+                                            ? AppColors.success
+                                            : AppColors.error,
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -346,51 +323,21 @@ class _AllVehiclesScreenState extends State<AllVehiclesScreen> {
                                         performAction(
                                           () => context
                                               .read<AdminVehicleProvider>()
-                                              .changeAvailability(vehicle.id, val),
+                                              .changeAvailability(
+                                                vehicle.id,
+                                                val,
+                                              ),
                                           'Availability updated',
                                         );
                                       },
                                     ),
                                   ),
                                   const Spacer(),
-                                  if (vehicle.approvalStatus.toLowerCase() == 'pending') ...[
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                      ),
-                                      onPressed: () {
-                                        performAction(
-                                          () => context
-                                              .read<AdminVehicleProvider>()
-                                              .approveVehicle(vehicle.id),
-                                          'Vehicle approved',
-                                        );
-                                      },
-                                      icon: const Icon(Icons.check, size: 16),
-                                      label: const Text('Approve', style: TextStyle(fontSize: 13)),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    OutlinedButton.icon(
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                        foregroundColor: AppColors.error,
-                                        side: const BorderSide(color: AppColors.error),
-                                      ),
-                                      onPressed: () {
-                                        performAction(
-                                          () => context
-                                              .read<AdminVehicleProvider>()
-                                              .rejectVehicle(vehicle.id),
-                                          'Vehicle rejected',
-                                        );
-                                      },
-                                      icon: const Icon(Icons.close, size: 16),
-                                      label: const Text('Reject', style: TextStyle(fontSize: 13)),
-                                    ),
-                                    const SizedBox(width: 8),
-                                  ],
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      color: AppColors.error,
+                                    ),
                                     tooltip: 'Delete vehicle',
                                     onPressed: () => confirmDelete(vehicle),
                                   ),

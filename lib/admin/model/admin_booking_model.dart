@@ -10,6 +10,9 @@ class AdminBookingModel {
   final int numberOfDays;
   final double totalAmount;
   final String status;
+  final String paymentStatus;
+  final String paymentReference;
+  final String paymentMethod;
 
   AdminBookingModel({
     required this.id,
@@ -23,6 +26,9 @@ class AdminBookingModel {
     required this.numberOfDays,
     required this.totalAmount,
     required this.status,
+    this.paymentStatus = 'pending',
+    this.paymentReference = '',
+    this.paymentMethod = '',
   });
 
   factory AdminBookingModel.fromMap(
@@ -38,11 +44,12 @@ class AdminBookingModel {
       shopName: map['shopName'] ?? '',
       startDate: map['startDate'] ?? '',
       endDate: map['endDate'] ?? '',
-      numberOfDays:
-          map['numberOfDays'] ?? 0,
-      totalAmount:
-          (map['totalAmount'] ?? 0).toDouble(),
+      numberOfDays: map['numberOfDays'] ?? 0,
+      totalAmount: (map['totalAmount'] ?? 0).toDouble(),
       status: map['status'] ?? 'pending',
+      paymentStatus: map['paymentStatus'] ?? 'pending',
+      paymentReference: map['paymentReference'] ?? '',
+      paymentMethod: map['paymentMethod'] ?? '',
     );
   }
 }
